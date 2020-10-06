@@ -1,0 +1,127 @@
+<?php
+$displayErrorMsg = false;
+$response = $this->getData();
+$responseDecode = json_decode($response['data']);
+$orderActive = true;
+?>
+<div class="forumpay_get_rate_container">
+	<div class="payment_status_container yl-pale yl-pale-yellow" data-role="payment-get-rate">
+		<?php
+		if(isset($responseDecode->payment_response)){
+			$paymentData = $responseDecode->payment_response;
+			if(!isset($paymentData->err)){
+				$invoice_amount = $paymentData->invoice_amount;
+				$invoice_currency = $paymentData->invoice_currency;
+				$currency = $paymentData->currency;
+				$rate = $paymentData->rate;
+				$amount_exchange = $paymentData->amount_exchange;
+				$network_processing_fee = $paymentData->network_processing_fee;
+				$amount = $paymentData->amount;
+
+				$wait_time = $paymentData->wait_time;
+				$fast_transaction_fee_currency = $paymentData->fast_transaction_fee_currency;
+				$fast_transaction_fee = $paymentData->fast_transaction_fee;
+				$payment_id = $paymentData->payment_id;
+				?>
+				<div class="payment_info">
+					<div class="item_group invoice_amount">
+						<div class="form-label"><?= __('Invoice amount') ?>:</div>
+						<div class="form-data"><?= $invoice_amount ?> <?= $invoice_currency ?></div>
+					</div>
+					<div class="item_group rate">
+						<div class="form-label"><?= __('Rate') ?>:</div>
+						<div class="form-data"><?= '1 '.$currency.' = '.$rate.' '.$invoice_currency ?></div>
+					</div>
+					<div class="item_group exchange_amount">
+						<div class="form-label"><?= __('Exchange amount') ?>:</div>
+						<div class="form-data"><?= $amount_exchange.' '.$currency ?></div>
+					</div>
+					<div class="item_group network_processing_fee">
+						<div class="form-label"><?= __('Network processing fee') ?>:</div>
+						<div class="form-data"><?= $network_processing_fee.' '.$currency ?></div>
+					</div>
+					<div class="item_group total">
+						<div class="form-label"><?= __('Total') ?>:</div>
+						<div class="form-data"><?= $amount.' '.$currency ?></div>
+					</div>
+				</div>
+				<div class="payment_info_bottom">
+					<div class="item_group tx_fee">
+						<div class="form-label"><?= __('TX fee').' ('.$fast_transaction_fee_currency.') '.__('set to') ?>:</div>
+						<div class="form-data"><?= $fast_transaction_fee.' '.$fast_transaction_fee_currency ?></div>
+					</div>
+					<div class="item_group expected_time_to_wait">
+						<div class="form-label"><?= __('Expected time to wait') ?>:</div>
+						<div class="form-data"><?= $wait_time ?></div>
+					</div>
+				</div>
+			<?php	
+			}else{
+				$displayErrorMsg = true;
+				$errorMesage = $paymentData->err;
+			}
+		}else{
+			$displayErrorMsg = true;
+			$errorMesage = __('We are not able to track order from the API.');
+		} 
+		if($displayErrorMsg){ ?>
+			<div role="alert" class="messages">
+		        <div class="message-error error message" data-ui-id="message-success">
+		            <div> <?= $errorMesage ?></div>
+		        </div>
+		    </div>
+		<?php } ?>
+	</div>
+</div>
+<style>
+.forumpay_get_rate_container {
+    padding: 20px 00px;
+    max-width:500px;
+    margin:auto;
+}
+.forumpay_get_rate_container .payment_info .item_group.payment_total{
+	font-weight: bold;
+	font-size: 16px;
+}
+.hidden_row{display: none !important;}
+
+.yl-pale-green{
+	background-color: #ddffdd;
+}
+.yl-pale-yellow{
+	background-color: #ffffcc;
+}
+.yl-pale{
+	width: 100%;
+	padding: 20px;
+	box-shadow: 0 2px 5px 0 rgba(0,0,0,0.16), 0 2px 10px 0 rgba(0,0,0,0.12);
+	box-sizing: border-box;
+}
+
+.forumpay_get_rate_container .payment_info, .forumpay_get_rate_container .payment_info_bottom{
+	display: table;
+	width: 100%;
+}
+.forumpay_get_rate_container .payment_info .item_group, .forumpay_get_rate_container .payment_info_bottom .item_group{
+    display: table-row;
+}
+.forumpay_get_rate_container .payment_info .form-label,
+.forumpay_get_rate_container .payment_info .form-data,
+.forumpay_get_rate_container .payment_info_bottom .form-label,
+.forumpay_get_rate_container .payment_info_bottom .form-data{
+    display: table-cell;
+    padding: 4px;
+}
+.forumpay_get_rate_container .payment_info .item_group.total{
+	font-weight: bold;
+	font-size: 20px;
+}
+.forumpay_get_rate_container .payment_info .item_group.invoice_amount, .forumpay_get_rate_container .payment_info .item_group.expected_time_to_wait{
+	font-weight: bold;
+	font-size: 16px;
+}
+.forumpay_get_rate_container .payment_info .form-data, .forumpay_get_rate_container .payment_info_bottom .form-data {
+    text-align: right;
+}
+</style>
+

@@ -1,0 +1,192 @@
+<?php
+$params = $this->getParams();
+$paymentConfig = $this->getPaymentConfig();
+?>
+<div id="payform_mage_container" class="payform_mage_container active-loader">
+	<!-- <div class="payment_btn" data-id="forumpay"> Start Payemnt </div> -->
+	<div class="lds-ripple-container"><div class="lds-ripple"><div></div><div></div></div></div>
+</div>
+
+<script type="text/javascript">
+
+	window.paymentconfig = JSON.parse('<?= $paymentConfig ?>');
+    window.paymentparams = JSON.parse('<?= $params ?>');
+    window.paymnetStatusAutoCheck = 10;
+
+    document.addEventListener('DOMContentLoaded', function() {
+    	(function($){
+		    var durationRefreshPaymentStatus = 30000;
+		    
+		    $('body').on('click', '[data-id="payment-qr"] img', function(){
+		      var _this = $(this);
+		      $('[data-id="payment-qr"]').addClass('disable_qr');
+		      _this.parents('[data-id="payment-qr"]').removeClass('disable_qr');
+		    });
+		    
+		    var startForumPayTrasaction = function(){
+		    	var process_payment_url = window.paymentconfig.process_payment_url;
+		        var data = {
+		          'action': 'forumpay_start_payment',
+		          'payment_cryptocurrency': ''
+		        };
+
+		        $.ajax({
+		          url: process_payment_url,
+		          type: 'POST',
+		          data: data,
+		          dataType: 'json',
+		          success: function (response){
+		            if(typeof response != "undefined" && typeof response.html != "undefined" && response.html && response.status){
+		              $('body').addClass('open_payment_window');
+		              $('#process_payment_window').remove();
+		              $('#payform_mage_container').html('<div id="process_payment_window" class="process_payment_window"></div>');
+		              $('#process_payment_window').html(response.html);
+		              if(typeof response.data != "undefined"){
+			              setTimeout(function(){
+		                    checkForumPayTrasaction(JSON.parse(response.data)); 
+		                  }, 5000);
+			          }
+		            }else{
+		              //$.mage.redirect(process_payment_url);
+		            }
+		          }
+		        });
+		    };
+
+		    var checkForumPayTrasaction = function(_responseData){
+		      if(typeof window.paymnetStatusAutoCheck != "undefined"){
+		        durationRefreshPaymentStatus = window.paymnetStatusAutoCheck*1000;
+		      }
+		      var process_payment_url = window.paymentconfig.process_payment_url;
+		      var paymentStatusContainer = $('[data-role="payment-status"]');
+		      paymentStatusContainer.trigger('show.loader');
+		      var _payment_response = _responseData.payment_response;
+
+		      var success_url = window.paymentconfig.success_url+'id/'+window.paymnetId;
+		      var cancel_url = window.paymentconfig.cancel_url+'id/'+window.paymnetId;
+		      if(typeof _payment_response != "undefined" 
+		          && typeof _payment_response.currency != "undefined" 
+		          && typeof _payment_response.payment_id != "undefined"
+		          && typeof _payment_response.address != "undefined"
+		        ){
+		        var data = {
+		          "currency" : _payment_response.currency,
+		          "invoice_no" : _payment_response.payment_id,
+		          "address" : _payment_response.address,
+		          'action': 'forumpay_check_payment',
+		        };
+
+		        $.ajax({
+		          url: process_payment_url,
+		          type: 'POST',
+		          data: data,
+		          dataType: 'json',
+		          success: function (response){
+		            if(typeof response != "undefined" && typeof response.html != "undefined" && response.html && response.status){
+						$('#payment_status').remove();
+						$('#pageCheckPaymentResult').html('<div id="payment_status">'+response.html+'</div>');
+						paymentStatusContainer.trigger('hide.loader');
+						var responseData = JSON.parse(response.data);  
+						if(typeof responseData != "undefined" && typeof responseData.payment_response != "undefined"){
+							var payment_response = responseData.payment_response;
+							if(typeof payment_response == "undefined" 
+							    || (typeof payment_response.status != "undefined"  && ((payment_response.status == "Cancelled" && typeof payment_response.cancelled != "undefined" && payment_response.cancelled != null) || (payment_response.status == "Confirmed" && typeof payment_response.confirmed != "undefined" && payment_response.confirmed != null)))
+							  ){
+							  $('#pageStartPaymentResult, #pageForumPayAction').remove();
+							  if(payment_response.status == "Confirmed"){
+							    $('#pageCheckPaymentResult').addClass('confirmed');
+							    window.location.replace(success_url);
+							  }else if (payment_response.status == "Cancelled"){
+							    $('#pageCheckPaymentResult').addClass('cancelled');
+							    window.location.replace(cancel_url);
+							  }
+							}else{
+							  setTimeout(function(){
+							    checkForumPayTrasaction(_responseData); 
+							  }, durationRefreshPaymentStatus);
+							}
+						}
+		            }
+		          }
+		        });
+		      }
+		    };
+
+		    var _abortPayment = function(_this){
+		    	var payment_id = _this.attr('data-payment-id');
+		    	var cancel_url = window.paymentconfig.cancel_url;
+		    	var cancel_url = cancel_url+'invoice_no/'+payment_id+'/action/manual';
+		        window.location.replace(cancel_url);
+		    };
+
+
+
+		    jQuery(document).ready(function(){
+		    	startForumPayTrasaction();
+		    });
+		    jQuery('body').on('click', '[data-id="cancel-payment"]', function(){
+		    	var _this = $(this);
+		    	_abortPayment(_this);
+		    });
+
+		    jQuery('body').on('click', '[data-id="forumpay"]', function(){
+		    	startForumPayTrasaction();
+		    });
+
+
+
+		})(jQuery);
+	});
+</script>
+<style>
+.payform_mage_container{
+	min-height:500px;
+	width:100%;
+	position: relative;
+}
+.lds-ripple-container{
+	display:none;
+}
+.active-loader .lds-ripple-container{
+	position: absolute;
+	position: absolute;
+    top: 50%;
+    left: 50%;
+    display: block;
+    transform: translate(-50%, -50%);
+}
+.active-loader .lds-ripple {
+  display: inline-block;
+  position: relative;
+  width: 80px;
+  height: 80px;
+}
+.active-loader .lds-ripple div {
+  position: absolute;
+  border: 4px solid #000;
+  opacity: 1;
+  border-radius: 50%;
+  animation: lds-ripple 1s cubic-bezier(0, 0.2, 0.8, 1) infinite;
+}
+
+.active-loader .lds-ripple div:nth-child(2) {
+  animation-delay: -0.5s;
+}
+@keyframes lds-ripple {
+  0% {
+    top: 36px;
+    left: 36px;
+    width: 0;
+    height: 0;
+    opacity: 1;
+  }
+  100% {
+    top: 0px;
+    left: 0px;
+    width: 72px;
+    height: 72px;
+    opacity: 0;
+  }
+}
+
+</style>

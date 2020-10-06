@@ -1,0 +1,106 @@
+<?php
+$displayErrorMsg = false;
+$response = $this->getData();
+$responseDecode = json_decode($response['data']);
+$orderActive = true;
+?>
+<div class="payment_status_container yl-pale yl-pale-yellow" data-role="payment-status">
+	<?php
+	if(isset($responseDecode->payment_response)){
+		$paymentData = $responseDecode->payment_response;
+		if(!isset($paymentData->err)){
+			$amount = $paymentData->amount;
+			$currency = $paymentData->currency;
+			$status = $paymentData->status;
+			if(strtolower($status) == 'cancelled'){
+				$orderActive = false;
+			}
+			?>
+			<div class="payment_status">
+				<span class="payment_status_text"><?= $status ?></span>
+			</div>
+			<?php if($orderActive){ ?>
+				<div class="payment_status_timer">
+					<?php /* ?><span class="statusRefreshTimerText"> <?= __('Payment status ') ?> </span> <?php */ ?>
+					<!-- <span id="statusRefreshTimer" class="statusRefreshTimer" data-id="statusRefreshTimer"></span> -->
+				</div>
+			<?php } ?>
+			<?php if($orderActive){ ?>
+				<div class="payment_info">
+					<div class="item_group payment hidden_row">
+						<div class="form-label"><?= __('Payment') ?>:</div>
+						<div class="form-data"><?= ' / ' ?></div>
+					</div>
+					<div class="item_group payment_total">
+						<div class="form-label"><?= __('Total') ?>:</div>
+						<div class="form-data"><?= $amount ?> <?= $currency ?></div>
+					</div>
+					<div class="item_group payment_waiting_status hidden_row">
+						<div class="form-label"><?= __('Status') ?>:</div>
+						<div class="form-data"><?= '0 / 1 (Waiting Payment)' ?></div>
+					</div>
+				</div>
+			<?php }
+		}else{
+			$displayErrorMsg = true;
+			$errorMesage = $paymentData->err;
+		}
+	}else{
+		$displayErrorMsg = true;
+		$errorMesage = __('We are not able to track order from the API.');
+	} 
+	if($displayErrorMsg){ ?>
+		<div role="alert" class="messages">
+	        <div class="message-error error message" data-ui-id="message-success">
+	            <div> <?= $errorMesage ?></div>
+	        </div>
+	    </div>
+	<?php } ?>
+</div>
+<style>
+.payment_status{
+	border: solid 1px #f00;
+	text-align: center;
+	padding: 15px;
+	margin-bottom: 15px;
+	color: #f00;
+	font-size: 16px;
+}
+.forumpay_container .payment_info .item_group.payment_total{
+	font-weight: bold;
+	font-size: 16px;
+}
+.payment_status_timer {
+    text-align: center;
+    margin-bottom: 20px;
+}
+.hidden_row{display: none !important;}
+</style>
+<?php if($orderActive){ ?>
+	<script type="text/javascript">
+	 //    require(['jquery', 'domReady!'], function ($) {
+		// 	function startTimer(duration, display) {
+		// 	    var timer = duration, minutes, seconds;
+		// 	    setInterval(function () {
+		// 	        minutes = parseInt(timer / 60, 10);
+		// 	        seconds = parseInt(timer % 60, 10);
+		// 	        minutes = minutes < 10 ? "0" + minutes : minutes;
+		// 	        seconds = seconds < 10 ? "0" + seconds : seconds;
+		// 	        display.text('['+seconds+']');
+		// 	        if (--timer < 0) {
+		// 	            timer = 00;
+		// 	        }
+		// 	    }, 1000);
+		// 	}
+		// 	jQuery(function ($) {
+		// 		var durationRefreshPaymentStatus = 30;
+		// 		if(typeof window.paymnetStatusAutoCheck != "undefined"){
+		// 			durationRefreshPaymentStatus = window.paymnetStatusAutoCheck
+		// 		}
+		// 	    var displayContainer = $('#statusRefreshTimer');
+		// 		startTimer(durationRefreshPaymentStatus, displayContainer);
+		// 	});
+		// });
+	</script>
+<?php } ?>
+

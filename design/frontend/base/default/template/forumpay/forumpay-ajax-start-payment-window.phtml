@@ -1,0 +1,247 @@
+<?php
+$displayErrorMsg = false;
+$paymentLogo = $this->getPaymentLogo();
+$response = $this->getData();
+$responseDecode = json_decode($response['data']);
+?>
+<div class="forumpay_container">
+	<div class="forumpay_inner">
+		<?php if($paymentLogo){ ?>
+			<div id="pagePaymentLogo" class="yl-pale payment-logo">
+				<img src="<?= $paymentLogo ?>">
+			</div>
+		<?php } ?>
+		<?php
+		if(isset($responseDecode->payment_response)){
+			$paymentData = $responseDecode->payment_response;
+			if(!isset($paymentData->err)){
+				$invoice_amount = $paymentData->invoice_amount;
+				$invoice_currency = $paymentData->invoice_currency;
+				$currency = $paymentData->currency;
+				$rate = $paymentData->rate;
+				$amount_exchange = $paymentData->amount_exchange;
+				$network_processing_fee = $paymentData->network_processing_fee;
+				$amount = $paymentData->amount;
+
+				$qr_img = $paymentData->qr_img;
+				$qr_alt_img = $paymentData->qr_alt_img;
+				$address = $paymentData->address;
+				$wait_time = $paymentData->wait_time;
+				$fast_transaction_fee_currency = $paymentData->fast_transaction_fee_currency;
+				$fast_transaction_fee = $paymentData->fast_transaction_fee;
+				$payment_id = $paymentData->payment_id;
+				//$payment_id = 'magento-order-009';
+				$access_token = $paymentData->access_token;
+				$address = $paymentData->address;
+				?>
+				<div id="pageStartPaymentResult" class="yl-pale yl-pale-green start-payment">
+					<div>
+						<div class="payment_info">
+							<div class="item_group invoice_amount">
+								<div class="form-label"><?= __('Invoice amount') ?>:</div>
+								<div class="form-data"><?= $invoice_amount ?> <?= $invoice_currency ?></div>
+							</div>
+							<div class="item_group ref_no">
+								<div class="form-label"><?= __('Reference no.') ?>:</div>
+								<div class="form-data"><?= $payment_id ?></div>
+							</div>
+							<div class="item_group rate">
+								<div class="form-label"><?= __('Rate') ?>:</div>
+								<div class="form-data"><?= '1 '.$currency.' = '.$rate.' '.$invoice_currency ?></div>
+							</div>
+							<div class="item_group exchange_amount">
+								<div class="form-label"><?= __('Exchange amount') ?>:</div>
+								<div class="form-data"><?= $amount_exchange.' '.$currency ?></div>
+							</div>
+							<div class="item_group network_processing_fee">
+								<div class="form-label"><?= __('Network processing fee') ?>:</div>
+								<div class="form-data"><?= $network_processing_fee.' '.$currency ?></div>
+							</div>
+							<div class="item_group total">
+								<div class="form-label"><?= __('Total') ?>:</div>
+								<div class="form-data"><?= $amount.' '.$currency ?></div>
+							</div>
+						</div>
+						<div class="payment_qr">
+							<div class="payment_qr_img_container">
+								<div class="payment_qr_img" data-id="payment-qr">
+									<img title="<?= __("Payment QR code with currency, address and amount.") ?>" src="<?= $qr_img ?>">
+								</div>
+								<div class="payment_qr_alt_img disable_qr" data-id="payment-qr">
+									<img title="<?= __("Alternative payment QR code with payment address only.") ?>" src="<?= $qr_alt_img ?>">
+								</div>
+							</div>
+							<div class="address">
+								<?= $address ?>
+							</div>
+						</div>
+						<div class="payment_info_bottom">
+							<div class="item_group tx_fee">
+								<div class="form-label"><?= __('TX fee').' ('.$fast_transaction_fee_currency.') '.__('set to') ?>:</div>
+								<div class="form-data"><?= $fast_transaction_fee.' '.$fast_transaction_fee_currency ?></div>
+							</div>
+							<div class="item_group expected_time_to_wait">
+								<div class="form-label"><?= __('Expected time to wait') ?>:</div>
+								<div class="form-data"><?= $wait_time ?></div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div id="pageCheckPaymentResult"> <!-- Don't remove this block --> </div>
+				
+				<div id="pageForumPayAction">
+					<div class="forumpay-action-container">
+						<div class="button cancel_payment_btn" data-id="forum-cancel-payment">
+							<span data-id="cancel-payment" data-payment-id="<?= $payment_id ?>" class="cancel_payment action primary"><?= __('Cancel payment') ?></span>
+						</div>
+					</div>
+				</div>
+
+				<script>
+				    window.paymnetStatusAutoCheck = 10;
+				    window.paymnetId = '<?php echo $payment_id ?>';
+				</script>
+			<?php } else{ 
+				$displayErrorMsg = true;
+				$errorMesage = $paymentData->err;
+			}
+		}else{
+			$displayErrorMsg = true;
+			$errorMesage = __('Something went wrong, Kindly contact to administrator.');
+		}
+		if($displayErrorMsg){ ?>
+			<div role="alert" class="messages yl-pale yl-pale-yellow">
+		        <div class="message-error error message" data-ui-id="message-success">
+		            <div> <?= $errorMesage ?></div>
+		        </div>
+		    </div>
+		<?php } ?>
+	</div>
+</div>
+<style>
+body.open_payment_window #checkout.checkout-container{
+	display: none;
+}
+.hide_btn{
+	display: none !important;
+}
+#process_payment_window {
+    width: 100%;
+	clear: both;
+	/*border: 02px solid #fdd;*/
+	padding: 50px;
+	box-sizing: border-box;
+	border-radius: 05px;
+	box-shadow: 0 0px 2px 0 rgba(0,0,0,0.16), 0 2px 2px 0 rgba(0,0,0,0.12);
+}
+.forumpay_container{
+	width: 100%;
+}
+.forumpay_inner{
+	width: 100%;
+	max-width: 500px;
+	margin: auto;
+	/*font-family: 'Roboto',Helvetica,Arial,Lucida,sans-serif;
+	font-size: 15px;
+	line-height: 15px;
+	letter-spacing: 1px;*/
+	letter-spacing: 1px;
+}
+.yl-pale-green{
+	background-color: #ddffdd;
+}
+.yl-pale-yellow{
+	background-color: #ffffcc;
+}
+.yl-pale{
+	width: 100%;
+	padding: 20px;
+	box-shadow: 0 2px 5px 0 rgba(0,0,0,0.16), 0 2px 10px 0 rgba(0,0,0,0.12);
+	box-sizing: border-box;
+}
+
+.forumpay_container .payment_info, .forumpay_container .payment_info_bottom{
+	display: table;
+	width: 100%;
+}
+.forumpay_container .payment_info .item_group, .forumpay_container .payment_info_bottom .item_group{
+    display: table-row;
+}
+.forumpay_container .payment_info .form-label,
+.forumpay_container .payment_info .form-data,
+.forumpay_container .payment_info_bottom .form-label,
+.forumpay_container .payment_info_bottom .form-data{
+    display: table-cell;
+    padding: 4px;
+}
+.forumpay_container .payment_info .item_group.total{
+	font-weight: bold;
+	font-size: 20px;
+}
+.forumpay_container .payment_info .item_group.invoice_amount, .forumpay_container .payment_info .item_group.expected_time_to_wait{
+	font-weight: bold;
+	font-size: 16px;
+}
+.forumpay_container .payment_info .form-data, .forumpay_container .payment_info_bottom .form-data {
+    text-align: right;
+}
+.payment_qr {
+    width: 100%;
+    text-align: center;
+    padding: 20px;
+    box-sizing: border-box;
+}
+.payment_qr_img_container {
+    position: relative;
+    overflow: hidden;
+}
+.disable_qr {
+    position: absolute;
+    max-width: 100px;
+    left: 0px;
+    top: 50%;
+    transform: translate(0%,-50%);
+}
+.payment_qr_img_container img {
+    width: 60%;
+    max-width: 250px;
+    cursor: pointer;
+}
+.payment_qr_img_container .disable_qr img {
+    width: 100%;
+}
+.payment_qr_img.disable_qr{
+	transform: translate(-50%,-50%);
+}
+.payment_qr_alt_img.disable_qr {
+	left: unset;
+    right: 0px;
+    transform: translate(50%,-50%);
+}
+.payment_qr .address {
+    margin: 20px;
+    word-break: break-all;
+}
+.forumpay-action-container .button .action {
+    width: 100%;
+    padding: 10px 15px;
+    text-align: center;
+}
+.forumpay-action-container .button {
+    margin: 10px 0px;
+    width: 100%;
+}
+.cancelled .payment_status_container {
+    background: #fdd;
+}
+.forumpay_container #pagePaymentLogo {
+    text-align: center;
+}
+.forumpay_container img {
+    display: inline-block;
+}
+</style>
+
+
+
+

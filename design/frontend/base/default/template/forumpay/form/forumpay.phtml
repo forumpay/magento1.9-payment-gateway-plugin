@@ -1,0 +1,125 @@
+<?php
+/**
+ * Magento
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Academic Free License (AFL 3.0)
+ * that is bundled with this package in the file LICENSE_AFL.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/afl-3.0.php
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to license@magento.com so we can send you a copy immediately.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magento to newer
+ * versions in the future. If you wish to customize Magento for your
+ * needs please refer to http://www.magento.com for more information.
+ *
+ * @category    design
+ * @package     base_default
+ * @copyright   Copyright (c) 2006-2018 Magento, Inc. (http://www.magento.com)
+ * @license     http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ */
+?>
+
+<div class="form-list forumpay-form-list" id="payment_form_<?php echo $this->getMethodCode() ?>" style="display:none;">
+	<?php
+	$cryptoCurrencyList = $this->getCryptoCurrencyList();
+	if($cryptoCurrencyList){
+	?>
+	<div>
+		<div class="forumpay-crypto-currency-list">
+			<label><?php echo $this->__('Payment Crypto Currency') ?>*</label>
+			<div class="input-box">
+				<select name="payment[crypto_currency]" data-id="buyer-cryptocurrency-list">
+					<option value=""> <?php echo $this->__('-- Select Crypto Currency --') ?> </option>
+					<?php 
+					$selectedCrypto = $this->htmlEscape($this->getInfoData('crypto_currency'));
+					foreach ($cryptoCurrencyList as $key => $cryptoCurrency) {
+						$selected = '';
+						if($selectedCrypto == $cryptoCurrency->currency){
+							$selected = 'selected="selected"';
+						}
+						echo '<option value="'.$cryptoCurrency->currency.'" '.$selected.'>'.$cryptoCurrency->description.' ('.$cryptoCurrency->currency.')</option>';
+					}
+					?>
+				</select>
+			</div>
+		</div>
+	</div>
+	<?php } ?>
+	<?php if ($instructions = $this->getInstructions()): ?>
+	<ul class="form-list checkout-agreements">
+		<li>
+			<div class="<?php echo $this->getMethodCode() ?>-instructions-content agreement-content">
+				<?php echo nl2br($instructions) ?>
+			</div>
+		</li>
+	</ul>
+	<?php endif; ?>  
+</div>
+<div>
+    <?php echo $this->getMethod()->getConfigData('message');?>
+</div>
+<div class="lds-ripple-section"><div class="lds-ripple-container"><div class="lds-ripple"><div></div><div></div></div></div></div>
+<style>
+#checkout-step-payment{
+	position: relative;
+}
+.lds-ripple-section{
+	position: absolute;
+    height: 100%;
+    width: 100%;
+    top: 0px;
+    background: rgba(255,255,255,0.7);
+    left: 0px;
+    display:none;
+}
+.active-loader .lds-ripple-section{
+	display: block;
+}
+.active-loader .lds-ripple-container{
+	position: absolute;
+	position: absolute;
+    top: 50%;
+    left: 50%;
+    display: block;
+    transform: translate(-50%, -50%);
+}
+.active-loader .lds-ripple {
+  display: inline-block;
+  position: relative;
+  width: 80px;
+  height: 80px;
+}
+.active-loader .lds-ripple div {
+  position: absolute;
+  border: 4px solid #000;
+  opacity: 1;
+  border-radius: 50%;
+  animation: lds-ripple 1s cubic-bezier(0, 0.2, 0.8, 1) infinite;
+}
+
+.active-loader .lds-ripple div:nth-child(2) {
+  animation-delay: -0.5s;
+}
+@keyframes lds-ripple {
+  0% {
+    top: 36px;
+    left: 36px;
+    width: 0;
+    height: 0;
+    opacity: 1;
+  }
+  100% {
+    top: 0px;
+    left: 0px;
+    width: 72px;
+    height: 72px;
+    opacity: 0;
+  }
+}
+</style>

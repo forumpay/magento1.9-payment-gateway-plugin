@@ -1,0 +1,56 @@
+<?php
+$paymentConfig = Mage::getModel('forumpay/standard')->getPaymentConfig();
+?>
+
+<script type="text/javascript">
+    document.addEventListener('DOMContentLoaded', function() {
+    	(function($){
+    		var getTransactionRateTimeOut;
+		    var durationRefreshPaymentStatus = 30000;
+		    
+		    var getTransactionRate = function(showLoader){
+		      var paymentForm = $('form[id="co-payment-form"]');
+		      var _this = $('[data-id="buyer-cryptocurrency-list"]');
+		      var process_payment_url = "<?php echo $paymentConfig['process_payment_url']?>";
+		      var selectedCurrency = _this.val();
+		      var data = {
+		        'action': 'forumpay_get_rate',
+		        'payment_cryptocurrency':selectedCurrency
+		      };
+		      if(selectedCurrency){
+		        if(typeof showLoader != "undefined" && showLoader==true){
+		          paymentForm.addClass('active-loader');
+		        }
+		        $.ajax({
+		          url: process_payment_url,
+		          type: 'POST',
+		          data: data,
+		          dataType: 'json',
+		          success: function (response){
+		            $('#process_get_rate_window').remove();
+		            if(typeof response != "undefined" && typeof response.html != "undefined" && response.html && response.status){
+		              _this.parents('.forumpay-crypto-currency-list').after('<div id="process_get_rate_window" class="process_get_rate_window"></div>');
+		              $('#process_get_rate_window').html(response.html);
+		              if(typeof showLoader != "undefined" && showLoader==true){
+		                paymentForm.removeClass('active-loader');
+		              }
+		              getTransactionRateTimeOut = setTimeout(function(){
+		                getTransactionRate(false);
+		              }, 15000);
+		            }else{
+		              console.log('Something Went Wrong!')
+		            }
+		          }
+		        });
+		      }else{
+		        $('#process_get_rate_window').remove();
+		      }
+		    }
+		    jQuery('body').on('change', '[data-id="buyer-cryptocurrency-list"]', function(){
+		    	clearTimeout(getTransactionRateTimeOut);
+		    	getTransactionRate(true);
+		    });
+
+		})(jQuery);
+	});
+</script>
