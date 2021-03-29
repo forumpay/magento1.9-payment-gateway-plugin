@@ -39,8 +39,7 @@ class Limitlex_ForumPay_IndexController extends Mage_Core_Controller_Front_Actio
         if($params && is_array($params) && array_key_exists('payment_id', $params)){
             $params['invoice_no'] = $params['payment_id'];
             $response = $this->_forumPayModel()->checkPayment($params);
-            echo 'success';
-            die();
+            die($response == false ? 'failure' : 'success');
         }else{
             header("HTTP/1.0 404 Not Found");
             die();
@@ -113,7 +112,7 @@ class Limitlex_ForumPay_IndexController extends Mage_Core_Controller_Front_Actio
         if($params && is_array($params) && array_key_exists('action', $params) && $params['action'] == 'manual'){
             $response = $this->_forumPayModel()->cancelPayment($params);
             $response = $this->_forumPayModel()->checkPayment($params);
-            if(isset($response->status) && strtolower($response->status) == 'cancelled' && isset($response->cancelled)){
+            if($response && isset($response->status) && strtolower($response->status) == 'cancelled' && isset($response->cancelled)){
                 $cancelMsg = __('Payment request cancelled successfully.');
             }
         }

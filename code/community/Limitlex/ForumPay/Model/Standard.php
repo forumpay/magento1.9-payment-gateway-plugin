@@ -155,6 +155,9 @@ class Limitlex_ForumPay_Model_Standard extends Mage_Payment_Model_Method_Abstrac
       $order = $this->getLastRealOrder();
       if($order && $order->getId()){
         $quote = $this->getLastQuote();
+        if(!$quote) {
+          return false;
+        }
         if($quoteId = $quote->getId()){
           $this->getCheckoutSession()->setForumPayQuoteId();
           $quote->setIsActive(true)->save();
@@ -172,6 +175,9 @@ class Limitlex_ForumPay_Model_Standard extends Mage_Payment_Model_Method_Abstrac
   public function getCryptoCurrencyList(){
     $action = 'GetCurrencyList';
     $response = $this->makeCurlRequest($action);
+    if($response == false) {
+      return false;
+    }
     $response = json_decode($response);
     return $response;
   }
@@ -197,6 +203,9 @@ class Limitlex_ForumPay_Model_Standard extends Mage_Payment_Model_Method_Abstrac
     ];
 
     $response = $this->makeCurlRequest($action, $req_params);
+    if($response == false) {
+      return false;
+    }
     $response = json_decode($response);
     //$response->print_string = '';
     if($response && !isset($response->err)){
@@ -213,6 +222,9 @@ class Limitlex_ForumPay_Model_Standard extends Mage_Payment_Model_Method_Abstrac
     }
 
     $order = $this->getLastRealOrder();
+    if(!$order) {
+      return false;
+    }
     $transactionAmount = $order->getGrandTotal();
     $orderNo = $order->getIncrementId();
     $orderCurrency = $order->getOrderCurrencyCode();
@@ -236,6 +248,9 @@ class Limitlex_ForumPay_Model_Standard extends Mage_Payment_Model_Method_Abstrac
     ];
       
     $response = $this->makeCurlRequest($action, $request_data);
+    if($response == false) {
+      return false;
+    }
     $response = json_decode($response);
     if($response && !isset($response->err)){
       $response->pos_id = $shopId;
@@ -253,9 +268,15 @@ class Limitlex_ForumPay_Model_Standard extends Mage_Payment_Model_Method_Abstrac
     $paymentId = $params['invoice_no']; //Magento Transaction Id
     
     $order = $this->getOrderByTransactionId($paymentId);
+    if(!$order) {
+      return false;
+    }
     $request_data = $this->generateApiRequestByOrder($order,$paymentId);
 
     $response = $this->makeCurlRequest($action, $request_data);
+    if($response == false) {
+      return false;
+    }
     $response = json_decode($response);
     //$response->print_string = '';
     if($response && !isset($response->err)){
@@ -277,9 +298,15 @@ class Limitlex_ForumPay_Model_Standard extends Mage_Payment_Model_Method_Abstrac
     $action = 'CancelPayment';
     $paymentId = $params['invoice_no']; //Magento Transaction Id
     $order = $this->getOrderByTransactionId($paymentId);
+    if(!$order) {
+      return false;
+    }
     $request_data = $this->generateApiRequestByOrder($order, $paymentId);
 
     $response = $this->makeCurlRequest($action, $request_data);
+    if($response == false) {
+      return false;
+    }
     $response = json_decode($response);
     //$response->print_string = '';
     if(!isset($response->err)){
@@ -287,6 +314,9 @@ class Limitlex_ForumPay_Model_Standard extends Mage_Payment_Model_Method_Abstrac
       if(isset($response->status)){
         if(strtolower($response->status) == 'cancelled'){
           $order = $this->getOrderByTransactionId($paymentId);
+          if(!$order) {
+            return false;
+          }
           $this->savePaymentDataToOrder($order, $response);
         }
       }
@@ -342,6 +372,7 @@ class Limitlex_ForumPay_Model_Standard extends Mage_Payment_Model_Method_Abstrac
         return $response;
     } catch (Exception $e) {
       Mage::logException($e);
+      return false;
     }
   }
 
