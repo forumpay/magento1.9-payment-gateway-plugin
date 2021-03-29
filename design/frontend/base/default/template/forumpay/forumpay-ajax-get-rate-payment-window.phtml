@@ -28,6 +28,9 @@ $orderActive = true;
 						<div class="form-label"><?= __('Invoice amount') ?>:</div>
 						<div class="form-data"><?= $invoice_amount ?> <?= $invoice_currency ?></div>
 					</div>
+				</div>
+				<details>
+					<summary>Details</summary>
 					<div class="item_group rate">
 						<div class="form-label"><?= __('Rate') ?>:</div>
 						<div class="form-data"><?= '1 '.$currency.' = '.$rate.' '.$invoice_currency ?></div>
@@ -40,6 +43,8 @@ $orderActive = true;
 						<div class="form-label"><?= __('Network processing fee') ?>:</div>
 						<div class="form-data"><?= $network_processing_fee.' '.$currency ?></div>
 					</div>
+				</details>
+				<div class="payment_info">
 					<div class="item_group total">
 						<div class="form-label"><?= __('Total') ?>:</div>
 						<div class="form-data"><?= $amount.' '.$currency ?></div>
@@ -122,6 +127,27 @@ $orderActive = true;
 }
 .forumpay_get_rate_container .payment_info .form-data, .forumpay_get_rate_container .payment_info_bottom .form-data {
     text-align: right;
+}
+
+.forumpay_get_rate_container details {
+	padding: 5px 0 5px 10px;
+}
+.forumpay_get_rate_container details summary {
+	display: list-item;
+	margin-bottom: 2px;
+}
+.forumpay_get_rate_container details .item_group {
+	display: flex;
+	flex-wrap: nowrap;
+	width: 100%;
+}
+.forumpay_get_rate_container details .item_group .form-label {
+	padding-left: 10px;
+}
+.forumpay_get_rate_container details .item_group .form-data {
+	flex-grow: 1;
+	text-align: right;
+	padding-right: 10px;
 }
 </style>
 

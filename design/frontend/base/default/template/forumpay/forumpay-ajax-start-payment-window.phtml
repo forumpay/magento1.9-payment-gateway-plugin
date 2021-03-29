@@ -41,22 +41,29 @@ $responseDecode = json_decode($response['data']);
 								<div class="form-label"><?= __('Invoice amount') ?>:</div>
 								<div class="form-data"><?= $invoice_amount ?> <?= $invoice_currency ?></div>
 							</div>
-							<div class="item_group ref_no">
-								<div class="form-label"><?= __('Reference no.') ?>:</div>
-								<div class="form-data"><?= $payment_id ?></div>
+						</div>
+						<details class="payment_info_details">
+							<summary>Details</summary>
+							<div class="details_items">
+								<div class="item_group ref_no">
+									<div class="form-label"><?= __('Ref. no.') ?>:</div>
+									<div class="form-data"><?= $payment_id ?></div>
+								</div>
+								<div class="item_group rate">
+									<div class="form-label"><?= __('Rate') ?>:</div>
+									<div class="form-data"><?= '1 '.$currency.' = '.$rate.' '.$invoice_currency ?></div>
+								</div>
+								<div class="item_group exchange_amount">
+									<div class="form-label"><?= __('Exchange amount') ?>:</div>
+									<div class="form-data"><?= $amount_exchange.' '.$currency ?></div>
+								</div>
+								<div class="item_group network_processing_fee">
+									<div class="form-label"><?= __('Network processing fee') ?>:</div>
+									<div class="form-data"><?= $network_processing_fee.' '.$currency ?></div>
+								</div>
 							</div>
-							<div class="item_group rate">
-								<div class="form-label"><?= __('Rate') ?>:</div>
-								<div class="form-data"><?= '1 '.$currency.' = '.$rate.' '.$invoice_currency ?></div>
-							</div>
-							<div class="item_group exchange_amount">
-								<div class="form-label"><?= __('Exchange amount') ?>:</div>
-								<div class="form-data"><?= $amount_exchange.' '.$currency ?></div>
-							</div>
-							<div class="item_group network_processing_fee">
-								<div class="form-label"><?= __('Network processing fee') ?>:</div>
-								<div class="form-data"><?= $network_processing_fee.' '.$currency ?></div>
-							</div>
+						</details>
+						<div class="payment_info">
 							<div class="item_group total">
 								<div class="form-label"><?= __('Total') ?>:</div>
 								<div class="form-data"><?= $amount.' '.$currency ?></div>
@@ -240,8 +247,24 @@ body.open_payment_window #checkout.checkout-container{
 .forumpay_container img {
     display: inline-block;
 }
+
+.forumpay_container .payment_info_details {
+	padding: 10px 0 10px 10px;
+}
+.forumpay_container .payment_info_details summary {
+	display: list-item;
+}
+.forumpay_container .payment_info_details .details_items {
+	margin-left: 30px;
+}
+.forumpay_container .payment_info_details .details_items .item_group {
+	display: flex;
+	flex-direction: row;
+	flex-wrap: nowrap;
+	width: 100%;
+}
+.forumpay_container .payment_info_details .details_items .item_group .form-data {
+	flex-grow: 1;
+	text-align: right;
+}
 </style>
-
-
-
-
