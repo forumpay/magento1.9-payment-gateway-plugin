@@ -207,7 +207,7 @@ class Limitlex_ForumPay_Model_Standard extends Mage_Payment_Model_Method_Abstrac
     $req_params = [
       'pos_id' => $pos_id,
       'invoice_currency' => $orderCurrency,
-      'invoice_amount' => $total,
+      'invoice_amount' => number_format($total, 2, '.', ''),
       'currency' => $cryptocurrency,
       'locale'=>$locale,
       'accept_zero_confirmations' => $azc,
@@ -261,7 +261,7 @@ class Limitlex_ForumPay_Model_Standard extends Mage_Payment_Model_Method_Abstrac
     $request_data = [
       'pos_id' => $shopId,
       'invoice_currency' => $orderCurrency,
-      'invoice_amount' => $transactionAmount,
+      'invoice_amount' => number_format($transactionAmount, 2, '.', ''),
       'currency' => $cryptoCurrency,
       'reference_no' => $orderNo,
       'locale' => $locale,
