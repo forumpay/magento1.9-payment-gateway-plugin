@@ -109,6 +109,15 @@ class Limitlex_ForumPay_Model_Standard extends Mage_Payment_Model_Method_Abstrac
   }
 
   /**
+   * Return accept_zero_confirmations
+   * @return boolean
+   */
+
+  public function AcceptZeroConfirmations(){
+    return $this->getHelper()->getAcceptZeroConfirmations();
+  }
+
+  /**
    * Return base64 Encoded apiKey 
    * @return string
    */
@@ -190,6 +199,7 @@ class Limitlex_ForumPay_Model_Standard extends Mage_Payment_Model_Method_Abstrac
     $quote = Mage::getSingleton('checkout/session')->getQuote();
     $orderCurrency = $quote->getQuoteCurrencyCode();
     $total = $quote->getGrandTotal();
+    $azc = $this->AcceptZeroConfirmations() ? 'true' : 'false';
     if($params && is_array($params) && array_key_exists('payment_cryptocurrency', $params) ){
       $cryptocurrency = $params['payment_cryptocurrency'];
     }
@@ -199,7 +209,8 @@ class Limitlex_ForumPay_Model_Standard extends Mage_Payment_Model_Method_Abstrac
       'invoice_currency' => $orderCurrency,
       'invoice_amount' => $total,
       'currency' => $cryptocurrency,
-      'locale'=>$locale
+      'locale'=>$locale,
+      'accept_zero_confirmations' => $azc,
     ];
 
     $response = $this->makeCurlRequest($action, $req_params);
@@ -225,14 +236,24 @@ class Limitlex_ForumPay_Model_Standard extends Mage_Payment_Model_Method_Abstrac
     if(!$order) {
       return false;
     }
+
     $transactionAmount = $order->getGrandTotal();
     $orderNo = $order->getIncrementId();
     $orderCurrency = $order->getOrderCurrencyCode();
     $payment = $order->getPayment();
     $cryptoCurrency = $payment->getCryptoCurrency();
+    $payerIpAddress = trim($order->getRemoteIp());
+    $payerUserAgent = $_SERVER['HTTP_USER_AGENT'];
+    $azc = $this->AcceptZeroConfirmations() ? 'true' : 'false';
+
+    if (filter_var($payerIpAddress, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) === false) {
+      $payerIpAddress = null;
+    }
+    
     if(!$cryptoCurrency){
       $cryptoCurrency = 'BCH';
     }
+    
     $locale = '';
     $shopId = $this->getShopId();
 
@@ -242,9 +263,11 @@ class Limitlex_ForumPay_Model_Standard extends Mage_Payment_Model_Method_Abstrac
       'invoice_currency' => $orderCurrency,
       'invoice_amount' => $transactionAmount,
       'currency' => $cryptoCurrency,
-      //'accept_zero_confirmations' => 'true',
       'reference_no' => $orderNo,
-      'locale'=>$locale
+      'locale' => $locale,
+      "payer_ip_address" => $payerIpAddress,
+      "payer_user_agent" => $payerUserAgent,
+      'accept_zero_confirmations' => $azc,
     ];
       
     $response = $this->makeCurlRequest($action, $request_data);

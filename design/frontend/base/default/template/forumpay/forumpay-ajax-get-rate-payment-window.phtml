@@ -5,7 +5,7 @@ $responseDecode = json_decode($response['data']);
 $orderActive = true;
 ?>
 <div class="forumpay_get_rate_container">
-	<div class="payment_status_container yl-pale yl-pale-yellow" data-role="payment-get-rate">
+	<div class="payment_status_container yl-pale" data-role="payment-get-rate">
 		<?php
 		if(isset($responseDecode->payment_response)){
 			$paymentData = $responseDecode->payment_response;
@@ -97,10 +97,16 @@ $orderActive = true;
 	background-color: #ffffcc;
 }
 .yl-pale{
-	width: 100%;
+	display: flex;
+	flex-direction: column;
+	width: 400px;
+	box-shadow: 0 5px 15px hsl(0deg 0% 0% / 10%);
+	border-radius: 15px;
+	background-color: #FFFFFF;
+	font-family: monospace;
+	color: #0e1726;
 	padding: 20px;
-	box-shadow: 0 2px 5px 0 rgba(0,0,0,0.16), 0 2px 10px 0 rgba(0,0,0,0.12);
-	box-sizing: border-box;
+	margin: 0 auto;
 }
 
 .forumpay_get_rate_container .payment_info, .forumpay_get_rate_container .payment_info_bottom{

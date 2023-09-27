@@ -6,11 +6,6 @@ $responseDecode = json_decode($response['data']);
 ?>
 <div class="forumpay_container">
 	<div class="forumpay_inner">
-		<?php if($paymentLogo){ ?>
-			<div id="pagePaymentLogo" class="yl-pale payment-logo">
-				<img src="<?= $paymentLogo ?>">
-			</div>
-		<?php } ?>
 		<?php
 		if(isset($responseDecode->payment_response)){
 			$paymentData = $responseDecode->payment_response;
@@ -35,6 +30,11 @@ $responseDecode = json_decode($response['data']);
 				$address = $paymentData->address;
 				?>
 				<div id="pageStartPaymentResult" class="yl-pale yl-pale-green start-payment">
+					<?php if($paymentLogo){ ?>
+						<div id="pagePaymentLogo" class="payment-logo">
+							<img src="<?= $paymentLogo ?>">
+						</div>
+					<?php } ?>
 					<div>
 						<div class="payment_info">
 							<div class="item_group invoice_amount">
@@ -93,8 +93,8 @@ $responseDecode = json_decode($response['data']);
 							</div>
 						</div>
 					</div>
+					<div id="pageCheckPaymentResult"> <!-- Don't remove this block --> </div>
 				</div>
-				<div id="pageCheckPaymentResult"> <!-- Don't remove this block --> </div>
 				
 				<div id="pageForumPayAction">
 					<div class="forumpay-action-container">
@@ -162,9 +162,12 @@ body.open_payment_window #checkout.checkout-container{
 }
 .yl-pale{
 	width: 100%;
+	box-shadow: 0 5px 15px hsl(0deg 0% 0% / 10%);
+	border-radius: 15px;
+	background-color: #FFFFFF;
+	font-family: monospace;
+	color: #0e1726;
 	padding: 20px;
-	box-shadow: 0 2px 5px 0 rgba(0,0,0,0.16), 0 2px 10px 0 rgba(0,0,0,0.12);
-	box-sizing: border-box;
 }
 
 .forumpay_container .payment_info, .forumpay_container .payment_info_bottom{
@@ -267,4 +270,17 @@ body.open_payment_window #checkout.checkout-container{
 	flex-grow: 1;
 	text-align: right;
 }
+
+.cancel_payment_btn {
+	background-color: #d82d2d;
+	border-radius: 5px;
+	font-weight: 800;
+	padding: 8px;
+}
+
+.cancel_payment_btn:hover {
+	background-color: #d82d2d;
+	color: #0e1726;
+}
+
 </style>

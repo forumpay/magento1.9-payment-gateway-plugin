@@ -9,7 +9,7 @@
  *************************************************************/
 class Limitlex_ForumPay_Helper_Data extends Mage_Core_Helper_Abstract
 {
-    const API_REQUEST_URL = 'https://forumpay.com/api/v2/'; // Trailing Slash(/) is required
+    const API_REQUEST_URL = 'https://api.forumpay.com/pay/v2/'; // Trailing Slash(/) is required
 
 	public function getConfig($field=null){
 		if($field==null || !$field){
@@ -18,9 +18,14 @@ class Limitlex_ForumPay_Helper_Data extends Mage_Core_Helper_Abstract
 		return Mage::getStoreConfig('payment/forumpay/'.$field, Mage::app()->getStore()->getStoreId());
 	}
 
-	public function getApiRequestEndpoint(){
-		return self::API_REQUEST_URL;
-	}
+    public function getApiRequestEndpoint(){
+        $api_url = $this->getConfig('api_url');
+        return $api_url ?? self::API_REQUEST_URL;
+    }
+
+    public function getAcceptZeroConfirmations(){
+        return $this->getConfig('accept_zero_confirmations') === '1' ? true : false;
+    }
 
 	public function getPaymentMethodImage(){
 		$logoImage = $this->getConfig('logo');

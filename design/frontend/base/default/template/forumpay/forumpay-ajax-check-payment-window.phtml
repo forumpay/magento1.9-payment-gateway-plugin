@@ -4,7 +4,7 @@ $response = $this->getData();
 $responseDecode = json_decode($response['data']);
 $orderActive = true;
 ?>
-<div class="payment_status_container yl-pale yl-pale-yellow" data-role="payment-status">
+<div class="payment_status_container" data-role="payment-status">
 	<?php
 	if(isset($responseDecode->payment_response)){
 		$paymentData = $responseDecode->payment_response;
@@ -59,10 +59,12 @@ $orderActive = true;
 </div>
 <style>
 .payment_status{
-	border: solid 1px #f00;
+	background: rgba(236,236,236,0.788);
+	border-radius: 5px;
 	text-align: center;
-	padding: 15px;
-	color: #f00;
+	margin-top: 5px;
+	padding: 10px;
+	color: #0e1726;
 	font-size: 16px;
 }
 .forumpay_container .payment_info .item_group.payment_total{
